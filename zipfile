@@ -2,5 +2,5 @@ cd Open-AutoGLM-Hybrid
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/Open-AutoGLM-Hybrid.git
+git remote add origin https://github.com/mzxdsg-hub/Open-AutoGLM-Hybrid.git
 git push -u origin main
