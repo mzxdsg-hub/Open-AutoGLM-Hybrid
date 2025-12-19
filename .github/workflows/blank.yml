@@ -1,18 +1,49 @@
-# 1. 进入项目目录
-cd Open-AutoGLM-Hybrid
+name: Build Android APK
 
-# 2. 初始化 Git 仓库
-git init
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发
 
-# 3. 添加所有文件
-git add .
-
-# 4. 提交
-git commit -m "Initial commit"
-
-# 5. 添加远程仓库 (替换为您的仓库地址)
-git remote add origin https://github.com/mzxdsg-hub/Open-AutoGLM-Hybrid.git
-
-# 6. 推送代码
-git branch -M main
-git push -u origin main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x android-app/gradlew
+      
+    - name: Build Debug APK
+      run: |
+        cd android-app
+        ./gradlew assembleDebug --stacktrace
+        
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: AutoGLM-Helper-Debug
+        path: android-app/app/build/outputs/apk/debug/app-debug.apk
+        
+    - name: Create Release APK (on tag)
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        cd android-app
+        ./gradlew assembleRelease --stacktrace
+        
+    - name: Upload Release APK (on tag)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-artifact@v4
+      with:
+        name: AutoGLM-Helper-Release
+        path: android-app/app/build/outputs/apk/release/app-release.apk
